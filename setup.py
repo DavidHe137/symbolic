@@ -6,7 +6,7 @@ import sys
 
 import setuptools  # type: ignore
 from setuptools.command import build_ext  # type: ignore
-from setuptools.extern.packaging import version  # type: ignore
+from packaging import version  # type: ignore
 
 
 __version__ = "1.0.3"
@@ -19,7 +19,6 @@ class CMakeExtension(setuptools.Extension):
 
 class CMakeBuild(build_ext.build_ext):
     def run(self) -> None:
-
         if not self.inplace:
             try:
                 out = subprocess.check_output(["cmake", "--version"])
@@ -71,6 +70,8 @@ class CMakeBuild(build_ext.build_ext):
             "-DBUILD_PYTHON=ON",
             "-DPYBIND11_PYTHON_VERSION=" + python_version,
             "-DCMAKE_BUILD_TYPE=" + build_type,
+            "-DCMAKE_CXX_STANDARD=17",
+            "-DCMAKE_CXX_STANDARD_REQUIRED=ON",
         ]
         if not self.inplace:
             # Use relative paths for install rpath.
