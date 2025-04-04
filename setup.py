@@ -72,6 +72,7 @@ class CMakeBuild(build_ext.build_ext):
             "-DCMAKE_BUILD_TYPE=" + build_type,
             "-DCMAKE_CXX_STANDARD=17",
             "-DCMAKE_CXX_STANDARD_REQUIRED=ON",
+            "-DCMAKE_POLICY_VERSION_MINIMUM=3.5",
         ]
         if not self.inplace:
             # Use relative paths for install rpath.
