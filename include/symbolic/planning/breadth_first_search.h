@@ -21,6 +21,9 @@
 
 namespace symbolic {
 
+// Global variable for revisit_states
+extern bool g_revisit_states;
+
 template <typename NodeT>
 class BreadthFirstSearch {
  public:
@@ -28,11 +31,15 @@ class BreadthFirstSearch {
 
   BreadthFirstSearch(
       const NodeT& root, size_t max_depth, bool verbose = false,
-      std::chrono::microseconds us_timeout = std::chrono::microseconds(0))
+      std::chrono::microseconds us_timeout = std::chrono::microseconds(0),
+      bool revisit_states = false)
       : max_depth_(max_depth),
         verbose_(verbose),
         root_(root),
-        timeout_(us_timeout) {}
+        timeout_(us_timeout) {
+    // Set the global variable from the constructor
+    g_revisit_states = revisit_states;
+  }
 
   iterator begin() const {
     iterator it(this);
@@ -107,6 +114,7 @@ BreadthFirstSearch<NodeT>::iterator::operator++() {
     if (bfs_->verbose_ && ancestors_->size() > depth) {
       depth = ancestors_->size();
       std::cout << "BFS depth: " << depth - 1 << std::endl;
+      std::cout << "Revisit states: " << g_revisit_states << std::endl;
     }
 
     // Return if node evaluates to true
@@ -127,7 +135,14 @@ BreadthFirstSearch<NodeT>::iterator::operator++() {
       }
       std::cout << "====================" << std::endl;
     }
-    for (const NodeT& child : node) {
+    
+    // Create an iterator for the node's children
+    typename NodeT::iterator it = node.begin();
+    
+    // Iterate over all children
+    for (; it != node.end(); ++it) {
+      const NodeT& child = *it;
+      
       // Print node
       if (bfs_->verbose_) {
         std::cout << child << std::endl << std::endl;

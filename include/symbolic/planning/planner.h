@@ -18,6 +18,9 @@
 
 namespace symbolic {
 
+// Forward declaration for the global variable
+extern bool g_revisit_states;
+
 class Planner {
  public:
   class Node {

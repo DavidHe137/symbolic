@@ -19,6 +19,9 @@
 
 namespace symbolic {
 
+// Define the global variable for revisit_states
+bool g_revisit_states = false;
+
 struct Planner::Node::NodeImpl {
 #ifdef SYMBOLIC_PLANNER_USE_ORDERED_CACHE
   using Cache = std::set<Node>;
@@ -96,11 +99,10 @@ Planner::Node::iterator Planner::Node::begin() const {
     it.child_ =
         Node(parent, it.child_, std::move(state), action.to_string(arguments));
 
-    // Return if state hasn't been previously visited
-    return it;
+    // Return if revisit_states is true or state hasn't been previously visited
     const std::shared_ptr<const Planner::Node::NodeImpl::Cache> ancestors =
         it.child_->ancestors_;
-    if (ancestors->count(it.child_) == 0) return it;
+    if (g_revisit_states || ancestors->count(it.child_) == 0) return it;
   }
 
   ++it;
@@ -173,11 +175,10 @@ Planner::Node::iterator& Planner::Node::iterator::operator++() {
       child_ =
           Node(parent_, child_, std::move(state), action.to_string(arguments));
 
-      // Return if state hasn't been previously visited
-      break;
+      // Return if revisit_states is true or state hasn't been previously visited
       const std::shared_ptr<const Planner::Node::NodeImpl::Cache> ancestors =
           child_->ancestors_;
-      if (ancestors->count(child_) == 0) break;
+      if (g_revisit_states || ancestors->count(child_) == 0) break;
     }
   }
 
@@ -200,11 +201,10 @@ Planner::Node::iterator& Planner::Node::iterator::operator--() {
       child_ =
           Node(parent_, child_, std::move(state), action.to_string(arguments));
 
-      // Return if state hasn't been previously visited
-      return *this;
+      // Return if revisit_states is true or state hasn't been previously visited
       const std::shared_ptr<const Planner::Node::NodeImpl::Cache> ancestors =
           child_->ancestors_;
-      if (ancestors->count(child_) == 0) return *this;
+      if (g_revisit_states || ancestors->count(child_) == 0) return *this;
     }
   }
 
@@ -232,11 +232,10 @@ Planner::Node::iterator& Planner::Node::iterator::operator--() {
       child_ =
           Node(parent_, child_, std::move(state), action.to_string(arguments));
 
-      // Return if state hasn't been previously visited
-      break;
+      // Return if revisit_states is true or state hasn't been previously visited
       const std::shared_ptr<const Planner::Node::NodeImpl::Cache> ancestors =
           child_->ancestors_;
-      if (ancestors->count(child_) == 0) break;
+      if (g_revisit_states || ancestors->count(child_) == 0) break;
     }
   }
 

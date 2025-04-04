@@ -53,10 +53,11 @@ std::vector<Object> ParseObjects(const Pddl& pddl,
 
 struct BreadthFirstSearch {
   BreadthFirstSearch(const Planner::Node& root, size_t max_depth, bool verbose,
-                     double timeout)
+                     double timeout, bool revisit_states = false)
       : bfs(root, max_depth, verbose,
             std::chrono::duration_cast<std::chrono::microseconds>(
-                std::chrono::duration<double>(timeout))) {}
+                std::chrono::duration<double>(timeout)),
+            revisit_states) {}
 
   ::symbolic::BreadthFirstSearch<Planner::Node> bfs;
   ::symbolic::BreadthFirstSearch<Planner::Node>::iterator it;
@@ -589,8 +590,8 @@ PYBIND11_MODULE(pysymbolic, m) {
   //     },
   //     py::keep_alive<0, 1>());
   py::class_<::BreadthFirstSearch>(m, "BreadthFirstSearch")
-      .def(py::init<const Planner::Node&, size_t, bool, double>(), "root"_a,
-           "max_depth"_a, "verbose"_a = false, "timeout"_a = 0)
+      .def(py::init<const Planner::Node&, size_t, bool, double, bool>(), "root"_a,
+           "max_depth"_a, "verbose"_a = false, "timeout"_a = 0, "revisit_states"_a = false)
       .def("__iter__", [](::BreadthFirstSearch& it) { return it; })
       .def("__next__", [](::BreadthFirstSearch& it) {
         if (!it.initialized) {
