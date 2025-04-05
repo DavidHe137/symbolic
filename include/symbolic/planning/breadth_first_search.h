@@ -24,6 +24,9 @@ namespace symbolic {
 // Global variable for revisit_states
 extern bool g_revisit_states;
 
+// Global variable for queue_goal_children
+extern bool g_queue_goal_children;
+
 template <typename NodeT>
 class BreadthFirstSearch {
  public:
@@ -32,13 +35,15 @@ class BreadthFirstSearch {
   BreadthFirstSearch(
       const NodeT& root, size_t max_depth, bool verbose = false,
       std::chrono::microseconds us_timeout = std::chrono::microseconds(0),
-      bool revisit_states = false)
+      bool revisit_states = false,
+      bool queue_goal_children = false)
       : max_depth_(max_depth),
         verbose_(verbose),
         root_(root),
         timeout_(us_timeout) {
-    // Set the global variable from the constructor
+    // Set the global variables from the constructor
     g_revisit_states = revisit_states;
+    g_queue_goal_children = queue_goal_children;
   }
 
   iterator begin() const {
@@ -122,6 +127,25 @@ BreadthFirstSearch<NodeT>::iterator::operator++() {
       if (bfs_->verbose_) {
         std::cout << "Goal state reached: " << node << std::endl;
       }
+      
+      // Add children to queue if queue_goal_children is enabled and revisit_states is enabled and max depth isn't reached
+      if (g_queue_goal_children && g_revisit_states && ancestors_->size() < bfs_->max_depth_) {
+        // Create an iterator for the node's children
+        typename NodeT::iterator it = node.begin();
+        
+        // Iterate over all children
+        for (; it != node.end(); ++it) {
+          const NodeT& child = *it;
+          
+          // Print node
+          if (bfs_->verbose_) {
+            std::cout << child << std::endl << std::endl;
+          }
+
+          queue_.emplace(child, ancestors_);
+        }
+      }
+      
       return *this;
     }
 

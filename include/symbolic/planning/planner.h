@@ -21,6 +21,9 @@ namespace symbolic {
 // Forward declaration for the global variable
 extern bool g_revisit_states;
 
+// Forward declaration for queue_goal_children
+extern bool g_queue_goal_children;
+
 class Planner {
  public:
   class Node {

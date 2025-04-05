@@ -22,6 +22,9 @@ namespace symbolic {
 // Define the global variable for revisit_states
 bool g_revisit_states = false;
 
+// Define the global variable for queue_goal_children
+bool g_queue_goal_children = false;
+
 struct Planner::Node::NodeImpl {
 #ifdef SYMBOLIC_PLANNER_USE_ORDERED_CACHE
   using Cache = std::set<Node>;
